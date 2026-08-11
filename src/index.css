@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  /* Brand / safety accent */
+  --color-brand-50: #ecfdf3;
+  --color-brand-100: #d1fadf;
+  --color-brand-200: #a6f4c5;
+  --color-brand-500: #12b76a;
+  --color-brand-600: #039855;
+  --color-brand-700: #027a48;
+  --color-brand-900: #054f31;
+
+  /* Status: pending / medium priority */
+  --color-warn-50: #fffaeb;
+  --color-warn-100: #fef0c7;
+  --color-warn-500: #f79009;
+  --color-warn-600: #dc6803;
+  --color-warn-700: #b54708;
+
+  /* Status: in progress */
+  --color-info-50: #eff8ff;
+  --color-info-100: #d1e9ff;
+  --color-info-500: #2e90fa;
+  --color-info-600: #1570ef;
+  --color-info-700: #175cd3;
+
+  /* Status: overdue / high priority / errors */
+  --color-danger-50: #fef3f2;
+  --color-danger-100: #fee4e2;
+  --color-danger-500: #f04438;
+  --color-danger-600: #d92d20;
+  --color-danger-700: #b42318;
+
+  /* Neutral surfaces */
+  --color-surface: #f9fafb;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+body {
+  @apply text-slate-900 antialiased;
+  background-color: var(--color-surface);
+  background-image:
+    radial-gradient(circle at 10% -12%, rgba(18, 183, 106, 0.09), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(21, 112, 239, 0.05), transparent 36%),
+    radial-gradient(circle at 50% 105%, rgba(18, 183, 106, 0.05), transparent 42%),
+    radial-gradient(rgba(15, 36, 26, 0.06) 1px, transparent 1px);
+  background-size: auto, auto, auto, 22px 22px;
+  background-attachment: fixed;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+}
+
+@keyframes stage-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(21, 112, 239, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(21, 112, 239, 0);
+  }
+}
+
+.stage-pulse {
+  animation: stage-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes holo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes holo-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes holo-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0, -8px);
+  }
+}
+
+.holo-ring {
+  animation: holo-spin 16s linear infinite;
+}
+
+.holo-glow {
+  animation: holo-breathe 4s ease-in-out infinite;
+}
+
+.holo-panel {
+  animation: holo-drift 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-pulse,
+  .holo-ring,
+  .holo-glow,
+  .holo-panel {
+    animation: none;
+  }
+}
