@@ -1,5 +1,7 @@
 # Smart Food Co. — Supplier Query Management
 
+<!-- deploy trigger: force a fresh Cloudflare Pages build with VITE_API_URL now set -->
+
 A full-stack QA tool that lets a Quality Assurance manager at a food company track supplier
 queries about allergens, certificates, ingredient safety, and compliance documentation — instead
 of losing that trail in email.
