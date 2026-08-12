@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url';
 import { db } from './db.js';
 
 interface SupplierSeed {
@@ -254,7 +255,7 @@ const queries: QuerySeed[] = [
   },
 ];
 
-function seed() {
+export function runSeed() {
   const tx = db.transaction(() => {
     db.exec('DELETE FROM query_events; DELETE FROM queries; DELETE FROM suppliers;');
 
@@ -297,4 +298,18 @@ function seed() {
   console.log(`Seeded ${suppliers.length} suppliers and ${queries.length} queries.`);
 }
 
-seed();
+/** Seeds demo data only if the database is empty — safe to call on every server startup. */
+export function seedIfEmpty() {
+  const { count } = db.prepare('SELECT COUNT(*) as count FROM suppliers').get() as {
+    count: number;
+  };
+  if (count === 0) {
+    runSeed();
+  }
+}
+
+// Only run automatically when executed directly (`npm run seed`), not when imported.
+const isMainModule = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMainModule) {
+  runSeed();
+}

@@ -73,9 +73,10 @@ src/                          Frontend (Vite root)
     layout/                   AppShell (header/nav), PageTransition (route animation)
     supplier/                 SupplierTable, SupplierFilters, SupplierStatsBar
     query/                    PrioritySelector, QueryTimeline, QueryActions, contextualFields
-    login/                    HoloBackground (decorative)
+    auth/                     RequireAuth (route guard)
   pages/                      Login, SupplierList, RaiseQuery, QueryStatus
   hooks/                      useFetch (data loading), useDocumentTitle
+  lib/auth.ts                 Session-only demo auth flag (sessionStorage)
   types.ts                    Shared frontend type contracts (mirrors API responses)
 
 server/                       Backend (separate package)
@@ -111,6 +112,54 @@ npm run build          # type-check + production build the frontend
 ```
 
 If you ever need to run the pieces separately: `npm run dev:client` / `npm run dev:server`.
+
+## Deployment
+
+**Architecture:** static frontend build → Express API (separate service) → SQLite (on the API
+service's disk). Two deployable pieces, no shared server.
+
+### Environment variables
+
+| Where | Variable | Purpose |
+|---|---|---|
+| Frontend | `VITE_API_URL` | Base URL of the deployed backend, e.g. `https://your-backend.onrender.com`. Falls back to `http://localhost:4000` if unset. |
+| Backend | `PORT` | Set automatically by most hosts (Render, Railway, Heroku). Falls back to `4000`. |
+| Backend | `FRONTEND_URL` | Origin of the deployed frontend, added to the CORS allow-list. Local dev origins are always allowed regardless. |
+
+Copy `.env.example` → `.env` (frontend) and `server/.env.example` → `server/.env` (backend) as a
+reference — actual production values are set through your hosting platform's environment variable
+settings, not committed files.
+
+### Deploying the backend (e.g. Render Web Service)
+
+- Root directory: `server`
+- Build command: `npm install && npm run build`
+- Start command: `npm start`
+- Environment: `FRONTEND_URL=<your deployed frontend URL>`
+
+On first boot the server creates `server/data/` and the SQLite file if they don't exist, creates
+the schema, and seeds the demo dataset **only if the `suppliers` table is empty** — so a fresh
+deploy is self-bootstrapping, and later restarts never wipe data you've created through the UI. To
+force-reset back to the demo dataset, run `npm run seed` against that environment explicitly.
+
+### Deploying the frontend (e.g. Render Static Site, Netlify)
+
+- Build command: `npm install && npm run build`
+- Publish directory: `dist`
+- Environment: `VITE_API_URL=<backend URL from above>`
+
+`public/_redirects` (copied into `dist/` by the build) rewrites every path to `index.html`, so
+directly opening `/login` or `/queries/QRY-1042` on the deployed site loads correctly instead of
+404ing — required because this is a client-side-routed React Router app.
+
+### A note on SQLite here
+
+The SQLite file gives this deployment **real persistence for demo purposes** — data survives a
+server restart — without adding database infrastructure to a UX assignment. It is intentionally
+not a production-scale choice: most PaaS free tiers don't guarantee persistent disk across
+redeploys, and SQLite isn't built for concurrent writers across multiple server instances. A
+production version of this app would swap in a managed database (e.g. Postgres) behind the same
+route/API layer — the frontend wouldn't need to change at all.
 
 ## API Reference
 
