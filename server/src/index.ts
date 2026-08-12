@@ -11,8 +11,14 @@ const app = express();
 
 // Local dev origins are always allowed; the deployed frontend origin is added
 // via FRONTEND_URL so production CORS never falls back to a wildcard.
+// Trimmed and stripped of a trailing slash so a stray space or slash pasted
+// into the hosting platform's env var UI doesn't silently break the match
+// against the browser's exact Origin header.
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
-if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL.trim().replace(/\/+$/, ''));
+}
+console.log('CORS allowed origins:', allowedOrigins);
 app.use(cors({ origin: allowedOrigins }));
 
 app.use(express.json());
